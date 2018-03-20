@@ -153,6 +153,9 @@ pre,
 code,
 kbd,
 samp {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #fff !important;
   font-family: monospace, monospace;
   font-size: 1em; }
 
